@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cowin_flutter/slot.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: Colors.deepPurpleAccent,
+        primaryColor: Colors.teal,
       ),
       debugShowCheckedModeBanner: false,
       home: Home(),
@@ -49,7 +50,13 @@ class _HomeState extends State<Home> {
       setState(() {
         slots = result['sessions'];
       });
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>Slots()))
+      print(slots);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => Slot(
+                    slots: slots,
+                  )));
     });
   }
 
@@ -62,55 +69,75 @@ class _HomeState extends State<Home> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Column(children: [
+          Container(
+            margin: EdgeInsets.all(30),
+            height: 200,
+            child: Image.asset('assets/vaccine.png'),
+          ),
           TextField(
             controller: pincodeController,
             maxLength: 6,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(hintText: 'Enter PIN Code'),
           ),
-          TextField(
-            controller: dayController,
-            decoration: InputDecoration(hintText: 'Enter Date'),
-          ),
-          Container(
-            width: double.infinity,
-            height: 60,
-            child: DropdownButton<String>(
-              value: dropdownValue,
-              icon: Icon(Icons.arrow_drop_down),
-              iconSize: 24,
-              elevation: 16,
-              onChanged: (String newValue) {
-                setState(() {
-                  dropdownValue = newValue;
-                });
-              },
-              items: <String>[
-                '01',
-                '02',
-                '03',
-                '04',
-                '05',
-                '06',
-                '07',
-                '08',
-                '09',
-                '10',
-                '11',
-                '12'
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 60,
+                  child: TextField(
+                    controller: dayController,
+                    decoration: InputDecoration(hintText: 'Enter Date'),
+                  ),
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  height: 52,
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    value: dropdownValue,
+                    icon: Icon(Icons.arrow_drop_down),
+                    iconSize: 24,
+                    elevation: 16,
+                    onChanged: (String newValue) {
+                      setState(() {
+                        dropdownValue = newValue;
+                      });
+                    },
+                    items: <String>[
+                      '01',
+                      '02',
+                      '03',
+                      '04',
+                      '05',
+                      '06',
+                      '07',
+                      '08',
+                      '09',
+                      '10',
+                      '11',
+                      '12'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 10),
           Container(
-            height: 40,
+            height: 45,
             width: double.infinity,
             child: ElevatedButton(
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                      Theme.of(context).primaryColor)),
               onPressed: () {
                 findslots();
               },
