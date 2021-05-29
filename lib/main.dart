@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cowin_flutter/slot.dart';
+import 'package:cowin_flutter/slots.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,11 +10,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Colors.teal,
-      ),
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(brightness: Brightness.dark, primaryColor: Colors.teal),
       home: Home(),
     );
   }
@@ -26,22 +23,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  //----------------------------------------------------------------
-
-  TextEditingController pincodeController = TextEditingController();
-  TextEditingController dayController = TextEditingController();
+  //------------------------------------------------
+  TextEditingController pincodecontroller = TextEditingController();
+  TextEditingController daycontroller = TextEditingController();
   String dropdownValue = '01';
   List slots = [];
+  //-----------------------------------------------------
 
-//----------------------------------------------------------------
-
-  findslots() async {
+  fetchslots() async {
     await http
         .get(Uri.parse(
             'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByPin?pincode=' +
-                pincodeController.text +
+                pincodecontroller.text +
                 '&date=' +
-                dayController.text +
+                daycontroller.text +
                 '%2F' +
                 dropdownValue +
                 '%2F2021'))
@@ -50,7 +45,6 @@ class _HomeState extends State<Home> {
       setState(() {
         slots = result['sessions'];
       });
-      print(slots);
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -63,44 +57,49 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Vaccine Slots Viewer')),
-      body: Container(
-        padding: EdgeInsets.all(10),
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Column(children: [
-          Container(
-            margin: EdgeInsets.all(30),
-            height: 200,
-            child: Image.asset('assets/vaccine.png'),
-          ),
-          TextField(
-            controller: pincodeController,
-            maxLength: 6,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(hintText: 'Enter PIN Code'),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 60,
-                  child: TextField(
-                    controller: dayController,
-                    decoration: InputDecoration(hintText: 'Enter Date'),
+      appBar: AppBar(title: Text('Vaccination Slots')),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(10),
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Column(children: [
+            Container(
+              margin: EdgeInsets.all(20),
+              height: 250,
+              child: Image.asset('assets/vaccine.png'),
+            ),
+            TextField(
+              controller: pincodecontroller,
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              decoration: InputDecoration(hintText: 'Enter PIN Code'),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 60,
+                    child: TextField(
+                      controller: daycontroller,
+                      decoration: InputDecoration(hintText: 'Enter Date'),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Container(
+                SizedBox(width: 10),
+                Expanded(
+                    child: Container(
                   height: 52,
                   child: DropdownButton<String>(
                     isExpanded: true,
                     value: dropdownValue,
-                    icon: Icon(Icons.arrow_drop_down),
+                    icon: const Icon(Icons.arrow_drop_down),
                     iconSize: 24,
                     elevation: 16,
+                    underline: Container(
+                      color: Colors.grey.shade400,
+                      height: 2,
+                    ),
                     onChanged: (String newValue) {
                       setState(() {
                         dropdownValue = newValue;
@@ -126,25 +125,24 @@ class _HomeState extends State<Home> {
                       );
                     }).toList(),
                   ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-          Container(
-            height: 45,
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                      Theme.of(context).primaryColor)),
-              onPressed: () {
-                findslots();
-              },
-              child: Text('Find Slots'),
+                ))
+              ],
             ),
-          )
-        ]),
+            SizedBox(height: 20),
+            Container(
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).primaryColor)),
+                  onPressed: () {
+                    fetchslots();
+                  },
+                  child: Text('Find Slots'),
+                ))
+          ]),
+        ),
       ),
     );
   }
